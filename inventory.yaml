@@ -1,0 +1,57 @@
+---
+all:
+  children:
+    winserver:
+      hosts:
+        server.ad.ipa.test:
+          ansible_connection: winrm
+          ansible_winrm_server_cert_validation: ignore
+          ansible_user: "Administrator"
+          ansible_password: "{{ winserver_admin_password }}"
+    ipaserver:
+      hosts:
+        server.lin.ipa.test:
+          ansible_user: root
+      vars:
+        # KRA (not required, but we use it on ansible-freeipa tests)
+        ipaserver_setup_kra: yes
+        # DNS vars
+        ipaserver_setup_dns: yes
+        ipaserver_no_forwarders: yes
+        # trust vars
+        ipaserver_setup_adtrust: yes
+        ipaserver_netbios_name: IPA
+        # disable 'allow all' HBAC rule
+        ipaserver_no_hbac_allow: no
+    ipaclients:
+      hosts:
+        fedcli.ipa.test:
+          ansible_user: root
+      vars:
+        ipaservers: fedsrv.ipa.test
+        # ipaclient_force_join: yes
+  vars:
+    # passwords
+    ipaadmin_password: SomeADMINpassword
+    ipadm_password: SomeDMpassword
+    # server/realm
+    ipaserver_domain: lin.ipa.test
+    ipaserver_realm: LIN.IPA.TEST
+    # client configuration
+    ipaclient_mkhomedir: yes
+    # The following vars are not required by ansible-freeipa roles.
+    # Linux vars
+    ipaserver_ip: 192.168.122.251
+    ipaserver_hostname: server.lin.ipa.test
+    # Windows vars
+    winserver_ip: 192.168.122.252
+    winserver_hostname: server.ad.ipa.test
+    winserver_admin_password: SomeW1Npassword
+    winserver_dsrm_password: ad1Restore
+    winserver_domain: ad.ipa.test
+    winserver_realm: AD.IPA.TEST
+    winserver_netbios_name: AD
+    # timezones (the timezones must match)
+    ipaserver_timezone: "Etc/UTC"
+    winserver_timezone: "UTC"  # available timezones: `tzutil.exe /l`
+...

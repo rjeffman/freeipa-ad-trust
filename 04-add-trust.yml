@@ -1,0 +1,15 @@
+---
+- name: Playbook to create a trust
+  hosts: ipaserver
+  become: no
+  gather_facts: no
+
+  tasks:
+
+  - name: ensure the trust is present
+    ipatrust:
+      ipaadmin_password: SomeADMINpassword
+      realm: ad.ipa.test
+      admin: Administrator
+      password: "{{ winserver_admin_password }}"
+      state: present

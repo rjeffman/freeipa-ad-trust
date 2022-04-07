@@ -1,0 +1,33 @@
+---
+- name: Check SRV response on Linux side.
+  hosts: ipaserver
+  gather_facts: no
+
+  tasks:
+  - name: Retrieve _ldap._tcp SRV records for Linux and Windows domains.
+    command: nslookup
+    args:
+      stdin: |
+        set type=srv
+        _ldap._tcp.ad.ipa.test
+        _ldap._tcp.lin.ipa.test
+    register: nslookup
+    failed_when: "'389 server.lin.ipa.test.' not in nslookup.stdout or '389 server.ad.ipa.test.' not in nslookup.stdout"
+
+#-----
+
+- name: Check SRV response on Windows side.
+  hosts: winserver
+  gather_facts: no
+
+  tasks:
+  - name: Retrieve _ldap._tcp SRV records for Linux and Windows domains.
+    ansible.windows.win_command: nslookup
+    args:
+      stdin: |
+        set type=srv
+        _ldap._tcp.ad.ipa.test
+        _ldap._tcp.lin.ipa.test
+    register: nslookup
+    failed_when: "'_ldap._tcp.lin.ipa.test\tSRV' not in nslookup.stdout or '_ldap._tcp.ad.ipa.test\tSRV' not in nslookup.stdout"
+

@@ -1,0 +1,58 @@
+---
+- name: Deploy Windows Server AD
+  hosts: winserver
+  become: no
+
+  tasks:
+  - name: Ensure AD timezone matches IPA timezone.
+    community.windows.win_timezone:
+      timezone: "{{ winserver_timezone }}"
+
+  - name: Change the Window hostname
+    ansible.windows.win_hostname:
+      name: "server"
+    register: hostname
+
+  - name: Reboot server
+    ansible.windows.win_reboot:
+      msg: "Reboot after name and timezone changes."
+      pre_reboot_delay: 15
+    when: hostname.reboot_required or hostname.reboot_required
+
+  - name: Install AD feature
+    ansible.windows.win_feature:
+      name: AD-Domain-Services
+      include_management_tools: yes
+      include_sub_features: yes
+      state: present
+
+  - name: Install DNS feature and configure first AD Domain
+    ansible.windows.win_domain:
+      dns_domain_name: "{{ winserver_domain }}"
+      safe_mode_password: "{{ winserver_dsrm_password }}"
+      install_dns: yes
+      domain_netbios_name: "{{ winserver_netbios_name }}"
+    register: status
+
+  - name: Reboot server
+    win_reboot:
+      msg: "Reboot after AD Domain installation."
+      pre_reboot_delay: 15
+    when: status.changed
+
+  - name: Add IPA DNS forward zone
+    ansible.windows.win_command: "dnscmd 127.0.0.1 /ZoneAdd {{ ipaserver_domain }} /Forwarder {{ ipaserver_ip }}"
+    register: result
+    failed_when: result.failed and "DNS_ERROR_FORWARDER_ALREADY_EXISTS" not in result.stdout
+
+  - name: Add jdoe test user.
+    community.windows.win_domain_user:
+      # 'name'' will be the user SAM account name and identity.
+      name: jdoe
+      upn: "jdoe@{{ winserver_domain }}"
+      firstname: John
+      surname: Doe
+      enabled: yes
+      password_expired: no
+      password: SomeUS3Rpassword
+      update_password: on_create

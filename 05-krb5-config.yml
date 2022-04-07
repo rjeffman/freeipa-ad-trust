@@ -1,0 +1,24 @@
+---
+- name: Configure Kerberos to allow for AD users login.
+  hosts: "{{ target_host | default('ipaserver') }}"
+  become: yes
+  gather_facts: no
+
+  tasks:
+  - name: Modify /etc/krb5.conf
+    ansible.builtin.blockinfile:
+      path: /etc/krb5.conf
+      insertbefore: "kdc = {{ ipaserver_hostname }}:88"
+      block: |
+        auth_to_local = RULE:[1:$1@$0](^.*@AD_DOMAIN$)s/@AD_DOMAIN/@ad_domain/
+        auth_to_local = DEFAULT
+
+  - name: Restart Kerberos KDC
+    ansible.builtin.systemd:
+      name: krb5kdc
+      state: restarted
+
+  - name: Restart SSSD
+    ansible.builtin.systemd:
+      name: sssd
+      state: restarted

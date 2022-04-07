@@ -1,0 +1,36 @@
+---
+- name: Pre-checks to deploy IPA
+  hosts: ipaserver
+  become: no
+  gather_facts: no
+
+  tasks:
+  - name: Set FQDN for FreeIPA server
+    ansible.builtin.hostname:
+      name: "{{ ipaserver_hostname }}"
+
+  - name: Ensure IPA timezone matches AD timezone.
+    community.general.timezone:
+      name: "{{ ipaserver_timezone }}"
+    become: yes
+
+# ---------------------
+- name: Deploy IPA with support to AD.
+  hosts: ipaserver
+  become: yes
+  gather_facts: no
+
+  roles:
+  - role: ipaserver
+    state: present
+    become: yes
+
+  # IPA configuration of trust to Windows AD
+  tasks:
+  - name: Add forward to AD server
+    ipadnsconfig:
+      ipaadmin_password: SomeADMINpassword
+      forwarders:
+      - ip_address: "{{ winserver_ip }}"
+      forward_policy: "only"
+...

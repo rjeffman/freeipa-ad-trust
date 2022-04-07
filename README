@@ -1,0 +1,15 @@
+FreeIPA-AD Trust
+================
+
+This repository holds a set of Ansible playbooks used to configure a
+FreeIPA-AD trust test lab as described in
+
+    https://rafaeljeffman.com/projects/freeipa/en/basic-lab-ad-trust
+
+
+Apply the playbooks in the given order.
+
+Don't forget, on the Windows node, to download and execute:
+
+    https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
+
