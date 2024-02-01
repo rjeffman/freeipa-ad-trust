@@ -3,33 +3,30 @@ all:
   children:
     winserver:
       hosts:
-        server.ad.ipa.test:
+        ad_server:
+          ansible_host: "{{ winserver_hostname }}"
           ansible_connection: winrm
           ansible_winrm_server_cert_validation: ignore
           ansible_user: "Administrator"
           ansible_password: "{{ winserver_admin_password }}"
     ipaserver:
       hosts:
-        server.lin.ipa.test:
+        ipa_first_server:
+          ansible_host: "{{ ipaserver_hostname }}"
           ansible_user: root
       vars:
-        # KRA (not required, but we use it on ansible-freeipa tests)
-        ipaserver_setup_kra: yes
+        # KRA (is not required, but we use it on ansible-freeipa tests)
+        ipaserver_setup_kra: false
         # DNS vars
-        ipaserver_setup_dns: yes
-        ipaserver_no_forwarders: yes
+        ipaserver_setup_dns: true
+        ipaserver_no_forwarders: true
         # trust vars
-        ipaserver_setup_adtrust: yes
-        ipaserver_netbios_name: IPA
-        # disable 'allow all' HBAC rule
-        ipaserver_no_hbac_allow: no
-    ipaclients:
-      hosts:
-        fedcli.ipa.test:
-          ansible_user: root
-      vars:
-        ipaservers: fedsrv.ipa.test
-        # ipaclient_force_join: yes
+        ipaserver_setup_adtrust: true
+        ipaserver_netbios_name: LIN
+        # set to true to disable 'allow all' HBAC rule
+        ipaserver_no_hbac_allow: false
+        # disable DNSSEC
+        ipaserver_no_dnssec_validation: true
   vars:
     # passwords
     ipaadmin_password: SomeADMINpassword
@@ -38,7 +35,8 @@ all:
     ipaserver_domain: lin.ipa.test
     ipaserver_realm: LIN.IPA.TEST
     # client configuration
-    ipaclient_mkhomedir: yes
+    ipaclient_mkhomedir: true
+    ipaclient_no_ntp: true
     # The following vars are not required by ansible-freeipa roles.
     # Linux vars
     ipaserver_ip: 192.168.122.251
