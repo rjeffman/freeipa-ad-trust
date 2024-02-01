@@ -18,5 +18,5 @@ To add required Ansible collections use:
 
 Don't forget, on the Windows node, to download and execute:
 
-    https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
+    https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
 
