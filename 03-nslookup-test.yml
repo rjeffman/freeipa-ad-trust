@@ -12,7 +12,8 @@
         _ldap._tcp.ad.ipa.test
         _ldap._tcp.lin.ipa.test
     register: nslookup
-    failed_when: "'389 server.lin.ipa.test.' not in nslookup.stdout or '389 server.ad.ipa.test.' not in nslookup.stdout"
+    failed_when: "'389 {{ ipaserver_hostname }}.' not in nslookup.stdout or '389 {{ winserver_hostname}}.' not in nslookup.stdout"
+    changed_when: false
 
 #-----
 
@@ -29,5 +30,5 @@
         _ldap._tcp.ad.ipa.test
         _ldap._tcp.lin.ipa.test
     register: nslookup
-    failed_when: "'_ldap._tcp.lin.ipa.test\tSRV' not in nslookup.stdout or '_ldap._tcp.ad.ipa.test\tSRV' not in nslookup.stdout"
-
+    failed_when: "'_ldap._tcp.{{ ipaserver_domain }}\tSRV' not in nslookup.stdout or '_ldap._tcp.{{ winserver_domain }}\tSRV' not in nslookup.stdout"
+    changed_when: false
