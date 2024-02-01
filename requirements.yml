@@ -1,0 +1,5 @@
+---
+collections:
+  - name: microsoft.ad
+  - name: community.windows
+...
