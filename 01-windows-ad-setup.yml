@@ -14,6 +14,13 @@
       name: "server"
     register: hostname
 
+  - name: Disable ms_tcpip6 for all Interfaces
+    community.windows.win_net_adapter_feature:
+      interface: '*'
+      state: disabled
+      component_id:
+      - ms_tcpip6
+
   - name: Reboot server
     ansible.windows.win_reboot:
       msg: "Reboot after name and timezone changes."
