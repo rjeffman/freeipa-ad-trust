@@ -26,7 +26,7 @@
 
   # IPA configuration of trust to Windows AD
   tasks:
-  - name: Add forward to AD server
+  - name: Add glabal DNS forwarder to AD server
     ipadnsconfig:
       ipaadmin_password: SomeADMINpassword
       forwarders:
