@@ -1,0 +1,18 @@
+---
+- name: Enable AD administrator to act as a FreeIPA admin.
+  hosts: "{{ target_host | default('ipaserver') }}"
+  become: false
+  gather_facts: false
+  tasks:
+  - name: Ensure idoverride for administrator@ad.ipa.test in 'default trust view'
+    ipaidoverrideuser:
+      ipaadmin_password: SomeADMINpassword
+      idview: default trust view
+      anchor:
+      - administrator@ad.ipa.test
+  - name: Ensure idoverride for administrator@ad.ipa.test is part of admins group
+    ipagroup:
+      ipaadmin_password: SomeADMINpassword
+      name: admins
+      idoverrideuser: administrator@ad.ipa.test
+...
